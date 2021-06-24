@@ -1,10 +1,10 @@
 const ul = document.querySelector('ul');
 const form = document.querySelector('form');
 
-const htmlTemplete = (data)=>{
+const htmlTemplete = (data,id)=>{
     const time = data.created_at.toDate();
     const html = `
-        <li>
+        <li data-id="${id}">
             <div class="box">
                 <div>${data.title}</div>
                 <small>${time}</small>
@@ -16,7 +16,8 @@ const htmlTemplete = (data)=>{
 }
 db.collection('practicing').get().then(snapshot=>{
     snapshot.docs.forEach(doc=>{
-        htmlTemplete(doc.data());
+        const id = doc.id;
+        htmlTemplete(doc.data(),id);
     })
 
 }).catch(err=>console.log(err));
@@ -36,6 +37,9 @@ form.addEventListener('submit',e=>{
 
 ul.addEventListener('click',e=>{
     if(e.target.tagName === 'BUTTON'){
-        console.log(e.target.parentElement)
+        const id = e.target.parentElement.getAttribute('data-id');
+        db.collection('practicing').doc(id).delete().then(()=>{
+            console.log('deleted')
+        })
     }
 })
