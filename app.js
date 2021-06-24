@@ -14,6 +14,8 @@ const htmlTemplete = (data,id)=>{
     `
     ul.innerHTML += html;
 }
+// retriving at one time 
+/*
 db.collection('practicing').get().then(snapshot=>{
     snapshot.docs.forEach(doc=>{
         const id = doc.id;
@@ -21,7 +23,22 @@ db.collection('practicing').get().then(snapshot=>{
     })
 
 }).catch(err=>console.log(err));
+*/
 
+// realtime listiners
+
+db.collection('practicing').onSnapshot(snapshot=>{
+    snapshot.docChanges().forEach(change=>{
+        const id = change.id;
+        console.log(change.type)
+        if(change.type === 'added'){
+            htmlTemplete(change.doc.data());
+        } else if(change.type == 'removed'){
+            removeUi(id)
+        }
+    })
+})
+// adding data to firebase
 form.addEventListener('submit',e=>{
     e.preventDefault();
     const now = new Date();
@@ -35,6 +52,7 @@ form.addEventListener('submit',e=>{
     }).catch(err=>console.log(err));
 })
 
+// deleting data from firestore
 ul.addEventListener('click',e=>{
     if(e.target.tagName === 'BUTTON'){
         const id = e.target.parentElement.getAttribute('data-id');
@@ -43,3 +61,14 @@ ul.addEventListener('click',e=>{
         })
     }
 })
+
+// deleting from UI
+const removeUi = (id)=>{
+    const li = document.querySelectorAll('li')
+    console.log(li)
+   li.forEach(i=>{
+    if(i.getAttribute('data-id') === id){
+        i.remove();
+    }
+   })
+}
